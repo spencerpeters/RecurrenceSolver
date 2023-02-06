@@ -37,17 +37,18 @@ class ExplicitReduction(CoarseGrainedBasisReductionRecurrence):
         best_l_star = best_l_index + 1
 
         # one_same_exponent = self.lowest_index_of_same_exponent(C_index)
-
         right_C_index = 0 if objective_index == 0 else \
                         objective_index + low - 1
         assert right_C_index < C_index
         left_C_index = C_index - objective_index
         assert left_C_index <= C_index
-        assert self.get_value_of(left_C_index) + self.get_value_of(right_C_index) == self.get_value_of(C_index), f"""
-        Sum of C indices left + right {self.get_value_of(left_C_index)} + {self.get_value_of(right_C_index)}
-        is not equal to parent {self.get_value_of(C_index)}.
-        C_indices are: {left_C_index} {right_C_index} {C_index}
-        """
+        # assert np.isclose(self.get_log_value_of(left_C_index) * self.get_log_value_of(right_C_index),
+        #                   self.get_log_value_of(C_index))
+        #     f"""
+        # Sum of C indices left + right {self.get_value_of(left_C_index)} + {self.get_value_of(right_C_index)}
+        # is not equal to parent {self.get_value_of(C_index)}.
+        # C_indices are: {left_C_index} {right_C_index} {C_index}
+        # """
 
         optimal_left_parameters = (n - best_l_star, l, left_C_index)
         optimal_right_parameters = (n, best_l_star, right_C_index)
@@ -67,12 +68,18 @@ class ExplicitReduction(CoarseGrainedBasisReductionRecurrence):
         """
 
         # TODO big hack
+        step_type = StepType.RECURSIVE
+        optimal_parameters = [optimal_left_parameters,optimal_right_parameters]
         if self.objective_values[current_indices] < minimizer:
             minimizer = self.objective_values[current_indices]
+            step_type = StepType[self.step_types[current_indices]]
+            optimal_parameters = []
 
-        best_C_star = self.get_value_of(right_C_index)
-        return minimizer, [best_l_star, best_C_star], StepType.RECURSIVE, \
-            [optimal_left_parameters, optimal_right_parameters]
+        best_C_star = np.floor(self.get_log_value_of(right_C_index))
+        # TODO I think for the tree to make sense this has to be an index and we may have to overwrite child_parameters
+        # upshot: I think this shit makes good sense. What does not make sense is the tree
+        return minimizer, [best_l_star, best_C_star], step_type, \
+            optimal_parameters
 
 class ExplicitReductionToHKZ(ExplicitReduction):
 
@@ -91,3 +98,21 @@ class ExplicitReductionToDSP(ExplicitReduction):
     # Base cases for DSP in dimension k, using our optimistic guess k^(l * (k - l) / (2 * (k - 1))) for the approximation factor.
     def base_cases_and_types(self):
         return explicit_oracle_base_cases.dsp_base_cases(self)
+
+class ExplicitReductionToSVP(ExplicitReduction):
+    def __init__(self, k, maxN, base, max_exponent):
+        self.base_case_type = BaseCaseTypes.SVPOnly
+        super().__init__(k, maxN, base, max_exponent)
+
+    # Base cases for DSP in dimension k, using our optimistic guess k^(l * (k - l) / (2 * (k - 1))) for the approximation factor.
+    def base_cases_and_types(self):
+        return explicit_oracle_base_cases.svp_only_base_cases(self)
+
+class ExplicitReductionSanityCheck(ExplicitReduction):
+    def __init__(self, k, maxN, base, max_exponent):
+        self.base_case_type = BaseCaseTypes.SVPOnly
+        super().__init__(k, maxN, base, max_exponent)
+
+    # Base cases for DSP in dimension k, using our optimistic guess k^(l * (k - l) / (2 * (k - 1))) for the approximation factor.
+    def base_cases_and_types(self):
+        return explicit_oracle_base_cases.common_base_cases(self)

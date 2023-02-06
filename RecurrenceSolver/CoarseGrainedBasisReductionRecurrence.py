@@ -42,6 +42,13 @@ class CoarseGrainedBasisReductionRecurrence(OptimizingRecurrenceWithMutualReduci
         digit = self.get_digit(C_index)
         return digit * self.base**exponent
 
+    def get_log_value_of(self, C_index):
+        if C_index == 0:
+            return 0
+        exponent = self.get_exponent(C_index)
+        digit = self.get_digit(C_index)
+        return np.log2(digit) + exponent * np.log2(self.base)
+
     def lowest_index_of_same_exponent(self, C_index):
         exponent = self.get_exponent(C_index)
         return self.get_C_index(exponent, 1)
@@ -134,4 +141,5 @@ class CoarseGrainedBasisReductionRecurrence(OptimizingRecurrenceWithMutualReduci
         n, l, C = parameters
         l_star = self.l_star.optimal_values[parameters]
         C_star = self.C_star.optimal_values[parameters]
+        # TODO does this make sense?
         return [(n - l_star, l, C - C_star), (n, l_star, C_star)]
