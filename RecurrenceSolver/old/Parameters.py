@@ -30,4 +30,11 @@ class Parameters:
             0 <= index < {self.parameters[i].stop_index}"""
         return parameter_values
 
+# class NLTauParameters(Parameters):
+#
+#     def __init__(self, n, l, tau, k):
+#         self.k = k
+#         super().__init__([n, l, tau])
+#
+
 

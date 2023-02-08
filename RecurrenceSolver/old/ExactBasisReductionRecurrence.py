@@ -1,11 +1,36 @@
 import numpy as np
 
-from BasisReductionRecurrence import BasisReductionRecurrence
+from OptimizingRecurrenceWithMutualReducibility import OptimizingRecurrenceWithMutualReducibility
+from Parameter import Parameter
+from Parameters import Parameters
+from RecurrenceTypes import RecurrenceTypes
 from StepType import StepType
 from abc import ABC
 
 
-class ExactBasisReductionRecurrence(BasisReductionRecurrence, ABC):
+class ExactBasisReductionRecurrence(OptimizingRecurrenceWithMutualReducibility, ABC):
+
+    def __init__(self, k, max_N, max_C, debug=True):
+        self.k = k
+        self.N = Parameter("N", max_N + 1)
+        self.l = Parameter("l", max_N + 1)
+        self.C = Parameter("C", max_C + 1)
+        self.l_star = Parameter("l_star")
+        self.C_star = Parameter("C_star")
+        self.debug = debug
+        self.recurrence_type = RecurrenceTypes.EXACT
+        parameters = Parameters([self.N, self.l, self.C])
+        optimizing_parameters = Parameters([self.l_star, self.C_star])
+        super().__init__(parameters, optimizing_parameters)
+
+    def indices_in_solve_order(self):
+        return [((n, l, C), (n, n - l, C))
+                for n in range(self.k + 1, self.N.stop_index)
+                for C in range(1, self.C.stop_index)
+                for l in range(1, n // 2 + 1)]
+
+    def max_runtime_parameter(self):
+        return self.C.stop_index
 
     def recurrence_function(self, current_indices):
         n, l, C = current_indices
@@ -51,19 +76,18 @@ class ExactBasisReductionRecurrence(BasisReductionRecurrence, ABC):
         best_l_star = best_l_index + 1
         # Since l* = index + 1
 
-        # optimal_left_parameters = (n - best_l_star, l, C - best_C_star)
-        # optimal_right_parameters = (n, best_l_star, best_C_star)
-        # minimizer = self.objective_values[optimal_left_parameters] + \
-        #             (l / (n - best_l_star)) * self.objective_values[optimal_right_parameters]
+        optimal_left_parameters = (n - best_l_star, l, C - best_C_star)
+        optimal_right_parameters = (n, best_l_star, best_C_star)
+        minimizer = self.objective_values[optimal_left_parameters] + \
+                    (l / (n - best_l_star)) * self.objective_values[optimal_right_parameters]
 
-        minimizer = np.min(objective)
-
-        return minimizer, [best_l_star, best_C_star], StepType.RECURSIVE
-            # , \
-            # [optimal_left_parameters, optimal_right_parameters]
+        return minimizer, [best_l_star, best_C_star], StepType.RECURSIVE, \
+            [optimal_left_parameters, optimal_right_parameters]
 
     def child_parameters(self, parameters):
+        # print(parameters)
         step_type = StepType[self.step_types[parameters]]
+        # print(step_type)
         if step_type.is_base():
             return []
         if step_type.is_duality():

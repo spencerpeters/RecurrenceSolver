@@ -1,15 +1,57 @@
-from OptimizingRecurrence import OptimizingRecurrence
 import numpy as np
-from abc import ABC
 from StepType import StepType
 from TreeNode import TreeNode
+from abc import ABC, abstractmethod
+from tqdm import tqdm
 
-class OptimizingRecurrenceWithMutualReducibility(OptimizingRecurrence, ABC):
+class OptimizingRecurrenceWithMutualReducibility(ABC):
+
+    def __init__(self, parameters, optimizing_parameters=None, debug=False):
+        self.debug = debug
+        if optimizing_parameters is None:
+            self.optimizing_parameters = []
+        else:
+            self.optimizing_parameters = optimizing_parameters
+        self.parameters = parameters
+        self.objective_values = None
+        self.step_types = None
+
+    def shape(self):
+        return tuple(p.stop_index for p in self.parameters)
+
+    def __getitem__(self, sliceobj):
+        return self.objective_values[sliceobj]
+
+    def __len__(self):
+        return len(self.objective_values)
+
+    def with_base_cases(self, base_case_function):
+        self.base_cases_and_types = base_case_function(self)
+
+    @abstractmethod
+    def indices_in_solve_order(self):
+        pass
+
+    @abstractmethod
+    def child_parameters(self, parameters):
+        pass
+
+    @abstractmethod
+    def recurrence_function(self, current_index_tuple):
+        pass
 
     def solve(self):
         for p in self.parameters:
             p.optimal_values = np.full(self.shape(), np.nan, dtype=int)
-        super().solve()
+        for p in self.optimizing_parameters:
+            p.optimal_values = np.full(self.shape(), np.nan, dtype="int64")
+        self.objective_values, self.step_types = self.base_cases_and_types()
+        assert self.objective_values.shape == self.shape()
+        assert self.step_types.shape == self.shape()
+        for current_indices in tqdm(self.indices_in_solve_order()):
+            # if not self.step_types[current_indices[0]] == 'nan':
+            self.solve_step(current_indices)
+
 
     def solve_step(self, current_indices):
         # Now, current_indices is a list, containing tuples of indices that are mutually reducible.
@@ -18,7 +60,7 @@ class OptimizingRecurrenceWithMutualReducibility(OptimizingRecurrence, ABC):
         best_index = None
         best_step_type = None
         for current_index_tuple in current_indices:
-            current_objective_value, current_parameter_indices, current_step_type, _ = self.recurrence_function(
+            current_objective_value, current_parameter_indices, current_step_type = self.recurrence_function(
                 current_index_tuple)
             if current_objective_value < best_objective_value:
                 best_objective_value = current_objective_value
@@ -46,60 +88,16 @@ class OptimizingRecurrenceWithMutualReducibility(OptimizingRecurrence, ABC):
                 self.step_types[index_tuple] = StepType.STUCK.name
                 # for p in self.optimizing_parameters: p.optimal_values[current_indices] = np.nan
 
-    def make_tree(self, parameters):
-        children = [self.make_tree(p) for p in self.child_parameters(parameters)]
+    def make_tree(self, parameters, depth=1e10):
+        if depth == 0:
+            return TreeNode(parameters, self, [])
+        children = [self.make_tree(p, depth - 1) for p in self.child_parameters(parameters)]
         return TreeNode(parameters, self, children)
 
-
-    # def make_tree(self, parameter_values):
-    #     if self.objective_values is None:
-    #         print("Need to solve before making tree!")
-    #         return
-    #
-    #     step_type = StepType(solution.step_types[parameter_values])
-    #
-    #     if step_type == StepType.STUCK:
-    #         return NoSolutionNode(k, n, l, C, solution)
-    #     if step_type == StepType.LLL:
-    #         return LLLLeaf(k, n, l, C, solution)
-    #     if step_type == step_type.SVP:
-    #         return SVPLeaf(k, n, l, C, solution)
-    #     if step_type == step_type.DSP:
-    #         return DSPLeaf(k, n, l, C, solution)
-    #     if step_type == step_type.HKZ:
-    #         return HKZLeaf(k, n, l, C, solution)
-    #
-    #     next_step_is_dual = step_type == StepType.DUALITY
-    #     # TODO!!! This absolutely is NOT generic.
-    #
-    #     if next_step_is_dual:
-    #         working_l = n - l
-    #     else:
-    #         working_l = l
-    #
-    #     best_l_star = solution.l_star.optimal_[n, working_l, C])
-    #     best_C_star = solution.C_stars[n, working_l, C])
-    #
-    #     left_n = n - best_l_star
-    #     left_l = working_l
-    #     left_C = C - best_C_star
-    #     left_child = TreeNode.make_tree(solution, k, left_n, left_l, left_C)
-    #
-    #     right_n = n
-    #     right_l = best_l_star
-    #     right_C = best_C_star
-    #     right_child = TreeNode.make_tree(solution, k, right_n, right_l, right_C)
-    #
-    #     normal_node = NormalNode(k, n, working_l, C, solution, left_child, right_child)
-    #
-    #     if next_step_is_dual:
-    #         return DualityNode(k, n, l, C, solution, normal_node)
-    #     else:
-    #     return normal_node
-
-    # What to do:
-    # There should not be node classes of different types, since that screws up the genericity of it,
-    # and duplicates information between step-types and node types.
-    # Instead, the nodes should come only in leaf and base varieties, and have type labels.
-    # How will I know how to generically reduce? The recurrence method should return the parameter indices that we are reducing to.
-    # (In addition to the parameters that induced those indices--sometimes we might need additional parameters.)
+    def __hash__(self):
+        descriptor_list = [ord(c) for c in list(self.__class__.__name__)] + [p.stop_index for p in self.parameters]
+        initial = 37
+        modulus = 999331
+        for element in descriptor_list:
+            initial = initial * 37 ** element % modulus
+        return initial

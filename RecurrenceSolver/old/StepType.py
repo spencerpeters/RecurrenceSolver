@@ -9,11 +9,9 @@ class StepType(Enum):
     DSP = auto()
     TRIVIAL = auto()
     STUCK = auto()
-    SORTALLL = auto()
 
     def is_base(self):
         return self in [StepType.LLL,
-                        StepType.SORTALLL,
                         StepType.HKZ,
                         StepType.SVP,
                         StepType.DSP,
@@ -32,7 +30,6 @@ class StepType(Enum):
             StepType.DSP: "DSP",
             StepType.TRIVIAL: "T",
             StepType.STUCK: "NSOLN",
-            StepType.SORTALLL: "SL",
         }
         return mapping[self]
 
