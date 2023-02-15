@@ -93,7 +93,7 @@ class ExplicitOracleBasisReductionRecurrence(CoarseGrainedBasisReductionRecurren
         n, l, C = parameters
         if C == 0:
             t = TreeNode(parameters, self, [])
-            t.step_type_value = StepType.SORTALLL
+            t.step_type_value = StepType.SORTALLL.name
             return t
         else:
             return super().make_tree(parameters,depth)

@@ -1,5 +1,6 @@
 from StepType import StepType
 from treelib import Node, Tree
+from termcolor import colored
 
 class TreeNode:
     def __init__(self, parameters, solution, children=None):
@@ -15,11 +16,12 @@ class TreeNode:
 
     def __iter__(self):
         yield self
-        for node in self.children:
-            yield node
+        for child in self.children:
+            for node in iter(child):
+                yield node
 
     def is_leaf(self):
-        return self.children is None
+        return len(self.children) == 0
 
     def is_duality(self):
         return self.step_type() == StepType.DUALITY
@@ -58,7 +60,9 @@ class TreeNode:
 
     def show_coarse(self):
         def to_string(n):
-            return f"{n.step_type()}({n.parameters[0]}, {n.parameters[1]}, {n.solution.get_log_value_of(n.parameters[2]):.2f})"
+            raw_string = f"{n.step_type()}({n.parameters[0]}, {n.parameters[1]}, {n.solution.get_log_value_of(n.parameters[2]):.2f}) -> {n.solution[n.parameters] / n.parameters[1]:.2f}"
+            colored_string = colored(raw_string, StepType[n.step_type()].display_color())
+            return colored_string
         return self.as_treelib(to_string).show(key=lambda n: -n.data.treelib_key)
 
 

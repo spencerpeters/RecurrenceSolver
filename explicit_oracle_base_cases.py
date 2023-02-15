@@ -39,7 +39,7 @@ def svp_only_base_cases(recurrence):
 
     return base_cases, base_case_types
 
-def dsp_base_cases(recurrence):
+def dsp_base_cases_cost(recurrence, cost):
     # let's assume for now that this costs you 2^(nl) running time
     maxN = recurrence.N.stop_index
     maxCIndex = recurrence.C.stop_index
@@ -49,9 +49,15 @@ def dsp_base_cases(recurrence):
         for l in range(1, n):
             for C_index in range(maxCIndex):
                 logC = recurrence.get_log_value_of(C_index)
-                if logC >= n * l:
+                if logC >= cost(n, l):
                 # if logC >= n:
                     base_cases[n, l, C_index] = np.log2(n) * l * (n - l) / (2 * (n - 1))
                     base_case_types[n, l, C_index] = StepType.DSP.name
 
     return base_cases, base_case_types
+
+def dsp_base_cases_nl(recurrence):
+    return dsp_base_cases_cost(recurrence, cost=lambda n, l: n * l)
+
+def dsp_base_cases_n(recurrence):
+    return dsp_base_cases_cost(recurrence, cost=lambda n, l: n)

@@ -36,3 +36,16 @@ class StepType(Enum):
         }
         return mapping[self]
 
+    def display_color(self):
+        mapping = {
+            StepType.RECURSIVE: 'white',
+            StepType.DUALITY: "yellow",
+            StepType.LLL: "red",
+            StepType.SVP: "green",
+            StepType.DSP: "green",
+            StepType.TRIVIAL: "blue",
+            StepType.STUCK: "black",
+            StepType.SORTALLL: "red",
+        }
+        return mapping[self]
+

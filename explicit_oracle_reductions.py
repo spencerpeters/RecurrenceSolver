@@ -10,7 +10,12 @@ class ExplicitReductionToHKZ(ExplicitOracleBasisReductionRecurrence):
 class ExplicitReductionToDSP(ExplicitOracleBasisReductionRecurrence):
 
     def base_cases_and_types(self):
-        return explicit_oracle_base_cases.dsp_base_cases(self)
+        return explicit_oracle_base_cases.dsp_base_cases_nl(self)
+
+class ExplicitReductionToDSPCostN(ExplicitOracleBasisReductionRecurrence):
+
+    def base_cases_and_types(self):
+        return explicit_oracle_base_cases.dsp_base_cases_n(self)
 
 class ExplicitReductionToSVP(ExplicitOracleBasisReductionRecurrence):
 
