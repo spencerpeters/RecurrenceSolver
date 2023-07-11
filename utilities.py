@@ -32,3 +32,24 @@ def common_base_cases(recurrence):
     # # So, we leave the corresponding entries as np.nan values.
 
     return base_cases, base_case_types
+
+def blichfeldt_bound_on_lambda1(n):
+  blichfeldt = (2 / np.pi) * gamma_fn(2 + n/2)**(2/n)
+  return np.sqrt(blichfeldt)
+
+def best_bound_on_lambda1(n):
+  known_values_of_gamma_n_to_n = {
+      1: 1,
+      2: 4/3,
+      3: 2,
+      4: 4,
+      5: 8,
+      6: 64/3,
+      7: 64,
+      8: 256,
+  }
+
+  if n in known_values_of_gamma_n_to_n:
+    return np.sqrt(known_values_of_gamma_n_to_n[n]**(1/n))
+  else:
+    return blichfeldt_bound_on_lambda1(n)

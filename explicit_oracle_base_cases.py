@@ -1,6 +1,6 @@
 import numpy as np
 from StepType import StepType
-from utilities import common_base_cases
+from utilities import common_base_cases, best_bound_on_lambda1
 
 # costs are expressed in log_2 terms
 # LLL costs 0
@@ -34,7 +34,8 @@ def svp_only_base_cases(recurrence):
             logC = recurrence.get_log_value_of(C_index)
             if logC >= n:
                 # base_cases[n, 1, C_index] = np.log2(n) / 2
-                base_cases[n, 1, C_index] = (1 / 2) * np.log(n) / np.log(2)
+                # base_cases[n, 1, C_index] = (1 / 2) * np.log(n) / np.log(2)
+                base_cases[n, 1, C_index] = best_bound_on_lambda1(n)
                 # base_cases[n, 1, C_index] = np.log2(n) / 2 + 1e-10 * (logC - n)
 
                 base_case_types[n, 1, C_index] = StepType.SVP.name

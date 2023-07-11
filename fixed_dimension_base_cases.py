@@ -1,5 +1,5 @@
 import numpy as np
-from utilities import log_base_k, common_base_cases
+from utilities import log_base_k, common_base_cases, best_bound_on_lambda1
 from StepType import StepType
 
 # Everything should be in log_2 terms. Sheesh.
@@ -95,9 +95,11 @@ def svp_only_base_cases(recurrence):
     # Dimension k, l != 1 -> infinity, out of luck! Not allowed to do anything. Not even LLL.
 
     for n in range(1, k + 1):
-        base_cases[n, 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
+        # base_cases[n, 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
+        base_cases[n, 1, 1:] = best_bound_on_lambda1(k)
         base_case_types[n, 1, 1:] = StepType.SVP.name
-        base_cases[n, n - 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
+        # base_cases[n, n - 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
+        base_cases[n, n - 1, 1:] = best_bound_on_lambda1(k)
         base_case_types[n, n - 1, 1:] = StepType.SVP.name
 
     return base_cases, base_case_types
