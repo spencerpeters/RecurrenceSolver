@@ -46,17 +46,21 @@ def hkz_base_cases(k, maxN, max_runtime_parameter):
 
     return base_cases, base_case_types
 
-def svp_in_dim_k_only_base_cases(k, maxN, max_runtime_parameter):
-    assert False
-    base_cases, base_case_types = common_base_cases(k, maxN, max_runtime_parameter)
+def svp_in_dim_k_only_base_cases(recurrence):
+    base_cases, base_case_types = common_base_cases(recurrence)
+    maxN = recurrence.N.stop_index
+    max_runtime_parameter = recurrence.C.stop_index
+    k = recurrence.k
+    # assert False
+    base_cases, base_case_types = common_base_cases(recurrence)
 
     base_cases[k, :, :] = np.inf
     base_case_types[k, :, :] = StepType.STUCK.name
     # Dimension k, l != 1 -> infinity, out of luck! Not allowed to do anything.
-    base_cases[k, 1, 1:] = 1 / 2
+    base_cases[k, 1, 1:] = np.log2(best_bound_on_lambda1(k))
     base_case_types[k, 1, 1:] = StepType.SVP.name
     # Dimension k, l = 1, C > 0 -> SVP oracle -> log_approximation = 1/2
-    base_cases[k, k - 1, 1:] = 1 / 2
+    base_cases[k, k - 1, 1:] = np.log2(best_bound_on_lambda1(k))
     base_case_types[k, k - 1, 1:] = StepType.SVP.name
     # The dual
 
@@ -96,10 +100,10 @@ def svp_only_base_cases(recurrence):
 
     for n in range(1, k + 1):
         # base_cases[n, 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
-        base_cases[n, 1, 1:] = best_bound_on_lambda1(k)
+        base_cases[n, 1, 1:] = np.log2(best_bound_on_lambda1(n))
         base_case_types[n, 1, 1:] = StepType.SVP.name
         # base_cases[n, n - 1, 1:] = (1 / 2) * np.log(k) / np.log(2)
-        base_cases[n, n - 1, 1:] = best_bound_on_lambda1(k)
+        base_cases[n, n - 1, 1:] = np.log2(best_bound_on_lambda1(n))
         base_case_types[n, n - 1, 1:] = StepType.SVP.name
 
     return base_cases, base_case_types

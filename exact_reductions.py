@@ -20,7 +20,9 @@ class ExactReductionToSVPOnly(ExactBasisReductionRecurrence):
 
     # Base cases for SVP in dimension n <= k. n <= k, l != 1 not allowed.
     def base_cases_and_types(self):
-        return fixed_dimension_base_cases.svp_only_base_cases(self.k, self.N.stop_index, self.C.stop_index)
+        # return fixed_dimension_base_cases.svp_only_base_cases(self.k, self.N.stop_index, self.C.stop_index)
+        return fixed_dimension_base_cases.svp_only_base_cases(self)
+
 
 class ExactReductionToDSP(ExactBasisReductionRecurrence):
 
