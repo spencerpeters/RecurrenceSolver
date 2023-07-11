@@ -10,7 +10,11 @@ def common_base_cases(k, maxN, max_runtime_parameter):
     N, L, C = np.ogrid[:maxN, :maxN, :max_runtime_parameter]
     # Numpy notation for working with indices.
 
-    base_cases[:, :, 0] = (N * np.minimum(L, N - L)).squeeze()
+    # Spencer: let's make the LLL base case more realistic.
+    # base_cases[:, :, 0] = (N * np.minimum(L, N - L)).squeeze()
+    a = np.log(4/3) / np.log(2)
+
+    base_cases[:, :, 0] = (a/2) * (L * (N - L)).squeeze()
     base_case_types[:, :, 0] = StepType.LLL.name
 
     # print(log_approximation[:, :, 0])

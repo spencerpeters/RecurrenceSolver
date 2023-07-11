@@ -45,6 +45,8 @@ class CoarseGrainedBasisReductionRecurrence(BasisReductionRecurrence, ABC):
         assert self.get_value_of(left_C_index) + self.get_value_of(right_C_index) == self.get_value_of(C_index), f"""
          Sum of C indices left + right {self.get_value_of(left_C_index)} + {self.get_value_of(right_C_index)}
          is not equal to parent {self.get_value_of(C_index)}.
+         Instead it is: {self.get_value_of(left_C_index) + self.get_value_of(right_C_index)}
+         type is: {type(self.get_value_of(left_C_index))}
          C_indices are: {left_C_index} {right_C_index} {C_index}
          """
 
@@ -88,7 +90,7 @@ class CoarseGrainedBasisReductionRecurrence(BasisReductionRecurrence, ABC):
     def get_value_of(self, C_index):
         exponent = self.get_exponent(C_index)
         digit = self.get_digit(C_index)
-        return digit * self.base**exponent
+        return int(digit) * int(self.base)**int(exponent)
 
     def get_log_value_of(self, C_index):
         if C_index == 0:
@@ -116,6 +118,8 @@ class CoarseGrainedBasisReductionRecurrence(BasisReductionRecurrence, ABC):
             return self.get_C_index(exponent, 1)
 
     def child_parameters(self, parameters):
+        if self.step_types[parameters] == "nan":
+            return []
         step_type = StepType[self.step_types[parameters]]
         if step_type.is_base():
             return []
