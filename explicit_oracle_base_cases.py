@@ -7,6 +7,7 @@ from utilities import common_base_cases
 
 
 def hkz_base_cases(recurrence):
+    assert False
     maxN = recurrence.N.stop_index
     maxCIndex = recurrence.C.stop_index
     base_cases, base_case_types = common_base_cases(recurrence)
@@ -32,7 +33,8 @@ def svp_only_base_cases(recurrence):
         for C_index in range(maxCIndex):
             logC = recurrence.get_log_value_of(C_index)
             if logC >= n:
-                base_cases[n, 1, C_index] = np.log2(n) / 2
+                # base_cases[n, 1, C_index] = np.log2(n) / 2
+                base_cases[n, 1, C_index] = (1 / 2) * np.log(n) / np.log(2)
                 # base_cases[n, 1, C_index] = np.log2(n) / 2 + 1e-10 * (logC - n)
 
                 base_case_types[n, 1, C_index] = StepType.SVP.name
@@ -57,7 +59,9 @@ def dsp_base_cases_cost(recurrence, cost):
     return base_cases, base_case_types
 
 def dsp_base_cases_nl(recurrence):
+    assert False
     return dsp_base_cases_cost(recurrence, cost=lambda n, l: n * l)
 
 def dsp_base_cases_n(recurrence):
+    assert False
     return dsp_base_cases_cost(recurrence, cost=lambda n, l: n)

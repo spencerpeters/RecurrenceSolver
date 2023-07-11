@@ -1,5 +1,6 @@
 import numpy as np
 from StepType import StepType
+from scipy.special import gamma as gamma_fn
 
 def log_base_k(a, k):
     return np.log(a) / np.log(k)
@@ -15,7 +16,10 @@ def common_base_cases(recurrence):
 
     # base_cases[:, :, 0] = (N * np.minimum(L, N - L)).squeeze()
     # base_case_types[:, :, 0] = StepType.LLL.name
-    base_cases[:, :, :] = N * np.minimum(L, N - L)
+    a = np.log(4/3) / np.log(2)
+
+    # base_cases[:, :, :] = N * np.minimum(L, N - L)
+    base_cases[:, :, :] = (a/2) * (L * (N - L))
     base_case_types[:, :, :] = StepType.LLL.name
     # 0 oracle queries -> LLL -> log_approximation = n * min(l, n - l)
 
