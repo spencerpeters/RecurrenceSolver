@@ -47,11 +47,10 @@ def hkz_base_cases(k, maxN, max_runtime_parameter):
     return base_cases, base_case_types
 
 def svp_in_dim_k_only_base_cases(recurrence):
-    base_cases, base_case_types = common_base_cases(recurrence)
+    # base_cases, base_case_types = common_base_cases(recurrence)
     maxN = recurrence.N.stop_index
     max_runtime_parameter = recurrence.C.stop_index
     k = recurrence.k
-    # assert False
     base_cases, base_case_types = common_base_cases(recurrence)
 
     base_cases[k, :, :] = np.inf
