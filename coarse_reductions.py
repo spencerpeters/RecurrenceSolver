@@ -40,5 +40,3 @@ class CoarseReductionToDSP(CoarseGrainedBasisReductionRecurrence):
     def base_cases_and_types(self):
         # return fixed_dimension_base_cases.dsp_base_cases(self.k, self.N.stop_index, self.C.stop_index)
         return fixed_dimension_base_cases.dsp_base_cases(self)
-
-

@@ -26,3 +26,8 @@ class ExplicitReductionSanityCheck(ExplicitOracleBasisReductionRecurrence):
 
     def base_cases_and_types(self):
         return common_base_cases(self)
+
+class ExplicitReductionToSVPInDimKOnly(ExplicitOracleBasisReductionRecurrence):
+
+    def base_cases_and_types(self):
+        return explicit_oracle_base_cases.svp_in_dim_k_only_base_cases(self)
