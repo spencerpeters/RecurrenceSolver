@@ -32,36 +32,15 @@ def svp_only_base_cases(recurrence):
     for n in range(1,maxN):
         for C_index in range(maxCIndex):
             logC = recurrence.get_log_value_of(C_index)
-            if logC >= n:
+            # if logC >= n:
             # if logC >= n / 2:
-            # if logC >= 0.29 * n:
+            if logC >= 0.29 * n:
                 # base_cases[n, 1, C_index] = np.log2(n) / 2
                 # base_cases[n, 1, C_index] = (1 / 2) * np.log(n) / np.log(2)
                 base_cases[n, 1, C_index] = np.log2(best_bound_on_lambda1(n))
                 # base_cases[n, 1, C_index] = np.log2(n) / 2 + 1e-10 * (logC - n)
 
                 base_case_types[n, 1, C_index] = StepType.SVP.name
-
-    return base_cases, base_case_types
-
-def svp_in_dim_k_only_base_cases(recurrence):
-    maxN = recurrence.N.stop_index
-    maxCIndex = recurrence.C.stop_index
-    base_cases, base_case_types = common_base_cases(recurrence)
-    k = recurrence.k
-
-    for C_index in range(maxCIndex):
-        logC = recurrence.get_log_value_of(C_index)
-        # if logC >= n:
-        # if logC >= n / 2:
-        # if logC >= 0.29 * k:
-        if logC >= k:
-            # base_cases[n, 1, C_index] = np.log2(n) / 2
-            # base_cases[n, 1, C_index] = (1 / 2) * np.log(n) / np.log(2)
-            base_cases[k, 1, C_index] = np.log2(best_bound_on_lambda1(k))
-            # base_cases[n, 1, C_index] = np.log2(n) / 2 + 1e-10 * (logC - n)
-
-            base_case_types[k, 1, C_index] = StepType.SVP.name
 
     return base_cases, base_case_types
 

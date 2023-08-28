@@ -19,7 +19,7 @@ def common_base_cases(recurrence):
     a = np.log(4/3) / np.log(2)
 
     # base_cases[:, :, :] = N * np.minimum(L, N - L)
-    base_cases[:, :, :] = (a/4) * (L * (N - L))
+    base_cases[:, :, :] = (a/2) * (L * (N - L))
     base_case_types[:, :, :] = StepType.LLL.name
     # 0 oracle queries -> LLL -> log_approximation = n * min(l, n - l)
 
