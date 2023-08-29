@@ -2,3 +2,4 @@
 .idea/workspace.xml
 __pycache__/BasisReductionRecurrence.cpython-39.pyc
 *.pyc
+*.xml

@@ -29,7 +29,9 @@ def svp_only_base_cases(recurrence):
     maxCIndex = recurrence.C.stop_index
     base_cases, base_case_types = common_base_cases(recurrence)
 
-    for n in range(1,maxN):
+    k = 1 if recurrence.k is None else recurrence.k
+
+    for n in range(k, maxN):
         for C_index in range(maxCIndex):
             logC = recurrence.get_log_value_of(C_index)
             if logC >= n:

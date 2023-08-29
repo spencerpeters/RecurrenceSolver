@@ -12,20 +12,25 @@ def common_base_cases(recurrence):
     base_cases = np.full((maxN, maxN, maxCIndex), np.inf)
     base_case_types = np.full((maxN, maxN, maxCIndex), np.nan, dtype='U16')
 
-    N, L, C = np.ogrid[:maxN, :maxN, :maxCIndex]
+    # N, L, C = np.ogrid[:maxN, :maxN, :maxCIndex]
+    N, L = np.ogrid[:maxN, :maxN]
 
     # base_cases[:, :, 0] = (N * np.minimum(L, N - L)).squeeze()
     # base_case_types[:, :, 0] = StepType.LLL.name
     a = np.log(4/3) / np.log(2)
 
     # base_cases[:, :, :] = N * np.minimum(L, N - L)
-    base_cases[:, :, :] = (a/4) * (L * (N - L))
-    base_case_types[:, :, :] = StepType.LLL.name
+    base_cases[:, :, 0] = (a/4) * np.squeeze((L * (N - L)))
+    base_case_types[:, :, 0] = StepType.LLL.name
+
+    L, C = np.ogrid[:maxN, :maxCIndex]
+    if recurrence.k is not None:
+        base_cases[recurrence.k, :, :] = (a/4) * (L * (recurrence.k - L))
     # 0 oracle queries -> LLL -> log_approximation = n * min(l, n - l)
 
-    for i in range(maxN):
-        base_cases[i, i, :] = 0
-        base_case_types[i, i, :] = StepType.TRIVIAL.name
+    # for i in range(maxN):
+    #     base_cases[i, i, :] = 0
+    #     base_case_types[i, i, :] = StepType.TRIVIAL.name
 
     # # l = n is free
     # # the "dual" l = 0 "dunnaevenmakeanysense" as Noah would say.

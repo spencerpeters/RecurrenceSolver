@@ -10,7 +10,7 @@ class ExplicitOracleBasisReductionRecurrence(CoarseGrainedBasisReductionRecurren
         n, l, C_index = current_indices
         # print(n, l, C_index)
         # min_n = max(l, self.k)
-        min_n = l
+        min_n = l + 1
         low = self.lowest_index_reduces_to(C_index)
         # assert low < C_index or C_index == 1
         assert low < C_index or C_index == 0 or C_index == 1
@@ -26,6 +26,8 @@ class ExplicitOracleBasisReductionRecurrence(CoarseGrainedBasisReductionRecurren
         right_term = (l * np.concatenate([zero_part, rest], axis=1).T / (n - l_stars)).T
 
         objective = left_term + right_term
+        if len(objective) == 0:
+            return np.inf, None, None
 
         best_l_index, objective_index = np.unravel_index(np.argmin(objective), objective.shape)
         best_l_star = best_l_index + 1
@@ -72,7 +74,8 @@ class ExplicitOracleBasisReductionRecurrence(CoarseGrainedBasisReductionRecurren
         # Hack to prevent overwriting a base case.
         step_type = StepType.RECURSIVE
         # optimal_parameters = [optimal_left_parameters, optimal_right_parameters]
-        if self.objective_values[current_indices] <= minimizer:
+        if self.objective_values[current_indices] <= minimizer and \
+                self.step_types[current_indices] != 'nan':
             minimizer = self.objective_values[current_indices]
             step_type = StepType[self.step_types[current_indices]]
             # optimal_parameters = []
